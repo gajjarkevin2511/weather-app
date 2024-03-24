@@ -2,9 +2,6 @@ import { Dispatch, SetStateAction } from 'react'
 
 export interface ISearchComponentProps {
   showSuggestions: boolean
-  location: string
-  setLocation: Dispatch<SetStateAction<string>>
-  onSearchClick: () => void
   placeHolder: string
 }
 

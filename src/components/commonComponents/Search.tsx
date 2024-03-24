@@ -3,24 +3,26 @@ import { suggestions } from '../../utilities/constants'
 import weatherStore from '@/stores/WeatherStore'
 import { ISearchComponentProps } from '@/types/types'
 
-const Search: React.FC<ISearchComponentProps> = ({
-  showSuggestions,
-  location,
-  setLocation,
-  onSearchClick,
-  placeHolder,
-}) => {
+const Search: React.FC<ISearchComponentProps> = ({ showSuggestions, placeHolder }) => {
   const [suggest, setSuggest] = useState<string[]>([])
+  const [location, setLocation] = useState<string>('')
+  const { fetchWeatherData } = weatherStore
+
+  const getWeatherData = (): void => {
+    fetchWeatherData(location)
+    setSuggest([])
+  }
 
   const onSuggestionClick = (locationName: string): void => {
-    weatherStore.fetchWeatherData(locationName)
+    fetchWeatherData(locationName)
     setLocation(locationName)
     setSuggest([])
   }
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setLocation(e.target.value)
-    getSuggestions(e.target.value)
+    const name = e.target.value
+    setLocation(name)
+    getSuggestions(name)
   }
 
   const getSuggestions = (name: string): void => {
@@ -29,7 +31,7 @@ const Search: React.FC<ISearchComponentProps> = ({
       return
     }
 
-    const suggestionList: string[] | [] = suggestions.filter((e: string) =>
+    const suggestionList: string[] = suggestions.filter((e: string) =>
       e.toLocaleLowerCase().includes(name.toLocaleLowerCase()),
     )
     setSuggest(suggestionList)
@@ -38,25 +40,17 @@ const Search: React.FC<ISearchComponentProps> = ({
   return (
     <div className='search-container'>
       <input value={location} placeholder={placeHolder} onChange={onInputChange} />
-      {showSuggestions && (
+      {showSuggestions && suggest.length > 0 && (
         <div className='suggestion'>
-          {suggest.length > 0
-            ? suggest.map((locationName: string) => (
-                <button key={locationName} onClick={() => onSuggestionClick(locationName)}>
-                  {locationName}
-                </button>
-              ))
-            : null}
+          {suggest.map((locationName: string) => (
+            <button key={locationName} onClick={() => onSuggestionClick(locationName)}>
+              {locationName}
+            </button>
+          ))}
         </div>
       )}
 
-      <div
-        className='overlay'
-        onClick={() => {
-          onSearchClick()
-          setSuggest([])
-        }}
-      ></div>
+      <div className='overlay' onClick={getWeatherData}></div>
     </div>
   )
 }

@@ -11,7 +11,7 @@ import {
   WIND_TEXT,
   weatherIcons,
 } from '../utilities/constants'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { inject, observer } from 'mobx-react'
 import weatherStore from '../stores/WeatherStore'
 import Search from './commonComponents/Search'
@@ -20,12 +20,6 @@ import Loading from './commonComponents/Loading'
 import Toggle from './commonComponents/Toggle'
 
 const Card: React.FC = () => {
-  const [location, setLocation] = useState<string>('')
-
-  const getWeatherData = (): void => {
-    weatherStore.fetchWeatherData(location)
-  }
-
   useEffect(() => {
     weatherStore.fetchWeatherData(DEFAULT_CITY)
   }, [])
@@ -33,14 +27,7 @@ const Card: React.FC = () => {
   return (
     <>
       <div className='card-container'>
-        <Search
-          location={location}
-          onSearchClick={getWeatherData}
-          placeHolder='Search by City'
-          setLocation={setLocation}
-          showSuggestions={true}
-          key='searchComponent'
-        />
+        <Search placeHolder='Search by City' showSuggestions={true} key='searchComponent' />
         {weatherStore.error ? (
           <Error text='Error: Invalid City/State' key='errorComponent' />
         ) : weatherStore.loading ? (
